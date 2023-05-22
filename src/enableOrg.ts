@@ -14,7 +14,7 @@ async function start() {
   try {
     const enable = (process.env.ENABLE_ON?.split(",") || []) as string[];
     const org = process.env.GITHUB_ORG || "";
-    const client = await octokit(3);
+    const client = await octokit(15);
 
     // set a boolean flag 'automatic' if enable has the value 'automatic' and remove it from enable
     let automatic = false;
@@ -111,7 +111,8 @@ async function start() {
     }
   } catch (err) {
     error(err);
-    return err;
+    process.exit(1); // Exit with an error code
+    //return err;
   }
   return "success";
 }

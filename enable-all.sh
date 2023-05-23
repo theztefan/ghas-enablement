@@ -78,7 +78,7 @@ for org in $(cat ./bin/organizations.work.json | jq -c '.[] | select(.completed 
     app_client_secret=$(echo "${applicationSecrets}" | jq -c '.[] | select(.login == "'$org'")' | jq -c '.APP_CLIENT_SECRET' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g')
 
     sed -i -e "s/APP_ID=.*/APP_ID=$app_id/g" .env
-    sed -i -e "s:APP_PRIVATE_KEY=.*:APP_PRIVATE_KEY=\"${app_private_key//$'\n'/\\\\n}:g" .env
+    sed -i -e "s:APP_PRIVATE_KEY=.*:APP_PRIVATE_KEY=\"${app_private_key//$'\n'/\\\\n}\":g" .env
     sed -i -e "s/APP_INSTALLATION_ID=.*/APP_INSTALLATION_ID=$app_installation_id/g" .env
     sed -i -e "s/APP_CLIENT_ID=.*/APP_CLIENT_ID=$app_client_id/g" .env
     sed -i -e "s/APP_CLIENT_SECRET=.*/APP_CLIENT_SECRET=$app_client_secret/g" .env

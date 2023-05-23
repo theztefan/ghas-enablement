@@ -27,7 +27,7 @@ fi
 ## Set tmp dir
 mkdir -p /tmp/ghas-enablement
 tempDir="/tmp/ghas-enablement"
-sed -i '' -e "s|TEMP_DIR=.*|TEMP_DIR=$tempDir|g" .env
+sed -i -e "s|TEMP_DIR=.*|TEMP_DIR=$tempDir|g" .env
 
 
 # Get the enterprise name from the first argument
@@ -41,22 +41,22 @@ ghesServerUrl=$3
 
 # Get all the organizations for the enterprise
 # Set the enterprise name, GHES server, PAT token just for this call in .env
-sed -i '' -e "s/GITHUB_ENTERPRISE=.*/GITHUB_ENTERPRISE=$enterpriseName/g" .env
-sed -i '' -e "s/GITHUB_API_TOKEN=.*/GITHUB_API_TOKEN=$patToken/g" .env
-sed -i '' -e "s|GHES_SERVER_BASE_URL=.*|GHES_SERVER_BASE_URL=$ghesServerUrl|g" .env
-sed -i '' -e "s/GHES=.*/GHES=true/g" .env
+sed -i -e "s/GITHUB_ENTERPRISE=.*/GITHUB_ENTERPRISE=$enterpriseName/g" .env
+sed -i -e "s/GITHUB_API_TOKEN=.*/GITHUB_API_TOKEN=$patToken/g" .env
+sed -i -e "s|GHES_SERVER_BASE_URL=.*|GHES_SERVER_BASE_URL=$ghesServerUrl|g" .env
+sed -i -e "s/GHES=.*/GHES=true/g" .env
 yarn run getOrgs
 mv ./bin/organizations.json ./bin/organizations.work.json
 
 # Remove the token from .env as we will be using applications to get the tokens for the enablement
-sed -i '' -e "s/GITHUB_API_TOKEN=.*/GITHUB_API_TOKEN=/g" .env
+sed -i -e "s/GITHUB_API_TOKEN=.*/GITHUB_API_TOKEN=/g" .env
 
 
 # Get the features to enable from the second argument
 features=$2
 
 # Set the features in .env
-sed -i '' -e "s/ENABLE_ON=.*/ENABLE_ON=$features/g" .env
+sed -i -e "s/ENABLE_ON=.*/ENABLE_ON=$features/g" .env
 
 # Read the contents of the application-secrets.json file
 applicationSecrets=$(cat ./bin/application-secrets.json)
@@ -67,7 +67,7 @@ applicationSecrets=$(cat ./bin/application-secrets.json)
 for org in $(cat ./bin/organizations.work.json | jq -c '.[] | select(.completed != true)' | jq -c '.login' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g'); do
     echo "Enabling features for $org"
     # set the org name in .env
-    sed -i '' -e "s/GITHUB_ORG=.*/GITHUB_ORG=$org/g" .env
+    sed -i -e "s/GITHUB_ORG=.*/GITHUB_ORG=$org/g" .env
 
     # get the application secrets for the org and set them in .env
     app_id=$(echo "${applicationSecrets}" | jq -c '.[] | select(.login == "'$org'")' | jq -c '.APP_ID' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g')
@@ -77,11 +77,11 @@ for org in $(cat ./bin/organizations.work.json | jq -c '.[] | select(.completed 
     app_client_id=$(echo "${applicationSecrets}" | jq -c '.[] | select(.login == "'$org'")' | jq -c '.APP_CLIENT_ID' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g')
     app_client_secret=$(echo "${applicationSecrets}" | jq -c '.[] | select(.login == "'$org'")' | jq -c '.APP_CLIENT_SECRET' | sed 's/"//g' | sed 's/,//g' | sed 's/ //g')
 
-    sed -i '' -e "s/APP_ID=.*/APP_ID=$app_id/g" .env
-    sed -i '' -e "s:APP_PRIVATE_KEY=.*:APP_PRIVATE_KEY=\"${app_private_key//$'\n'/\\\\n}\":g" .env
-    sed -i '' -e "s/APP_INSTALLATION_ID=.*/APP_INSTALLATION_ID=$app_installation_id/g" .env
-    sed -i '' -e "s/APP_CLIENT_ID=.*/APP_CLIENT_ID=$app_client_id/g" .env
-    sed -i '' -e "s/APP_CLIENT_SECRET=.*/APP_CLIENT_SECRET=$app_client_secret/g" .env
+    sed -i -e "s/APP_ID=.*/APP_ID=$app_id/g" .env
+    sed -i -e "s:APP_PRIVATE_KEY=.*:APP_PRIVATE_KEY=\"${app_private_key//$'\n'/\\\\n}:g" .env
+    sed -i -e "s/APP_INSTALLATION_ID=.*/APP_INSTALLATION_ID=$app_installation_id/g" .env
+    sed -i -e "s/APP_CLIENT_ID=.*/APP_CLIENT_ID=$app_client_id/g" .env
+    sed -i -e "s/APP_CLIENT_SECRET=.*/APP_CLIENT_SECRET=$app_client_secret/g" .env
 
     # if the values for the org are not found in application-secrets.json, set the flag {completed: false} in organizations.work.json
     if [ -z "$app_id" ] || [ -z "$app_private_key" ] || [ -z "$app_installation_id" ] || [ -z "$app_client_id" ] || [ -z "$app_client_secret" ]; then

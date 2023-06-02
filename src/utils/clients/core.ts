@@ -24,7 +24,7 @@ export const client = async (retrySeconds?: number): Promise<Octokit> => {
         return true;
       },
     },
-  } as OctokitOptions;
+  } as unknown as OctokitOptions;
 
   if (env.GITHUB_API_TOKEN) {
     return new MyOctokit({
